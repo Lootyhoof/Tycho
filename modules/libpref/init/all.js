@@ -121,8 +121,6 @@ pref("dom.indexedDB.experimental", false);
 pref("dom.indexedDB.logging.enabled", true);
 // Detailed output in log messages.
 pref("dom.indexedDB.logging.details", true);
-// Enable profiler marks for indexedDB events.
-pref("dom.indexedDB.logging.profiler-marks", false);
 
 // Whether or not Web Workers are enabled.
 pref("dom.workers.enabled", true);
@@ -263,6 +261,9 @@ pref("media.cache_readahead_limit", 999999);
 
 // Master HTML5 media volume scale.
 pref("media.volume_scale", "1.0");
+
+// Default media volume
+pref("media.default_volume", "1.0");
 
 // Timeout for wakelock release
 pref("media.wakelock_timeout", 2000);
@@ -2374,9 +2375,6 @@ pref("dom.ipc.plugins.java.enabled", false);
 #endif
 
 pref("dom.ipc.plugins.flash.disable-protected-mode", false);
-
-pref("dom.ipc.plugins.flash.subprocess.crashreporter.enabled", true);
-pref("dom.ipc.plugins.reportCrashURL", true);
 
 // How long we wait before unloading an idle plugin process.
 // Defaults to 30 seconds.

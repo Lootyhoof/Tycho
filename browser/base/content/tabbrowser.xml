@@ -135,6 +135,22 @@
         ]]></getter>
       </property>
 
+      <property name="formValidationAnchor" readonly="true">
+        <getter><![CDATA[
+        if (this.mCurrentTab._formValidationAnchor) {
+          return this.mCurrentTab._formValidationAnchor;
+        }
+        let stack = this.mCurrentBrowser.parentNode;
+        // Create an anchor for the form validation popup
+        const NS_XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+        let formValidationAnchor = document.createElementNS(NS_XUL, "hbox");
+        formValidationAnchor.className = "form-validation-anchor";
+        formValidationAnchor.hidden = true;
+        stack.appendChild(formValidationAnchor);
+        return this.mCurrentTab._formValidationAnchor = formValidationAnchor;
+        ]]></getter>
+      </property>
+
       <method name="updateWindowResizers">
         <body><![CDATA[
           if (!window.gShowPageResizers)
@@ -953,11 +969,11 @@
               this.finder.mListeners.forEach(l => oldBrowser.finder.removeResultListener(l));
             }
 
-            var updatePageReport = false;
+            var updateBlockedPopups = false;
             if (!oldBrowser ||
-                (oldBrowser.pageReport && !newBrowser.pageReport) ||
-                (!oldBrowser.pageReport && newBrowser.pageReport))
-              updatePageReport = true;
+                (oldBrowser.blockedPopups && !newBrowser.blockedPopups) ||
+                (!oldBrowser.blockedPopups && newBrowser.blockedPopups))
+              updateBlockedPopups = true;
 
             newBrowser.setAttribute("type", "content-primary");
             newBrowser.docShellIsActive =
@@ -976,8 +992,8 @@
               });
             }
 
-            if (updatePageReport)
-              this.mCurrentBrowser.updatePageReport();
+            if (updateBlockedPopups)
+              this.mCurrentBrowser.updateBlockedPopups();
 
             // Update the URL bar.
             var loc = this.mCurrentBrowser.currentURI;
@@ -2611,10 +2627,6 @@
         ]]></body>
       </method>
 
-      <property name="pageReport"
-                onget="return this.mCurrentBrowser.pageReport;"
-                readonly="true"/>
-
       <property name="currentURI"
                 onget="return this.mCurrentBrowser.currentURI;"
                 readonly="true"/>
@@ -2747,6 +2759,18 @@
 
       <property name="securityUI"
                 onget="return this.mCurrentBrowser.securityUI;"
+                readonly="true"/>
+
+      <property name="fullZoom"
+                onget="return this.mCurrentBrowser.fullZoom;"
+                onset="this.mCurrentBrowser.fullZoom = val;"/>
+
+      <property name="textZoom"
+                onget="return this.mCurrentBrowser.textZoom;"
+                onset="this.mCurrentBrowser.textZoom = val;"/>
+
+      <property name="isSyntheticDocument"
+                onget="return this.mCurrentBrowser.isSyntheticDocument;"
                 readonly="true"/>
 
       <method name="_handleKeyEvent">
@@ -4095,7 +4119,7 @@
         canvas.mozOpaque = true;
         canvas.width = 160 * scale;
         canvas.height = 90 * scale;
-        PageThumbs.captureToCanvas(browser.contentWindow, canvas);
+        PageThumbs.captureToCanvas(browser, canvas);
         dt.setDragImage(canvas, -16 * scale, -16 * scale);
 
         // _dragData.offsetX/Y give the coordinates that the mouse should be
